@@ -55,105 +55,9 @@ namespace graphing {
         allLines: Bitmap
     }
 
-    function pencilUpDirection(d: number, x: number, y: number) {
-        if (d == 0) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            `, x - 3, y - 3)
-        } else if (d == 1) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            `, x - 3, y - 3)
-        } else if (d == 2) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            `, x, y - 3)
-        } else if (d == 3) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            `, x - 3, y)
-        } else if (d == 4) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            `, x - 3, y - 3)
-        }
-    }
-
-    function pencilDownDirection(d: number, x: number, y: number) {
-        if (d == 0) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 8 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            `, x - 3, y - 3)
-        } else if (d == 1) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 8 1 1 1 
-            `, x - 3, y - 3)
-        } else if (d == 2) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            8 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            `, x, y - 3)
-        } else if (d == 3) {
-            screen().drawBitmap(bmp`
-            1 1 1 8 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            1 1 1 1 1 1 1 
-            `, x - 3, y)
-        } else if (d == 4) {
-            screen().drawBitmap(bmp`
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 8 
-            1 1 1 1 
-            1 1 1 1 
-            1 1 1 1 
-            `, x - 3, y - 3)
-        }
-    }
-
     function retainOldBits(s: state) {
-        let tempx = (s.x + (160 - 4)) % 160
-        let tempy = (s.y + (120 - 4)) % 120
+        let tempx = (s.x + 156) % 160
+        let tempy = (s.y + 116) % 120
         for (let index3 = 0; index3 < 9; index3++) {
             for (let index4 = 0; index4 < 9; index4++) {
                 if (screen().getPixel(tempx, tempy) == 8) {
@@ -161,11 +65,11 @@ namespace graphing {
                 }
                 tempy = (tempy + 1) % 120
             }
-            tempy = (s.y + (120 - 4)) % 120
+            tempy = (s.y + 116) % 120
             tempx = (tempx + 1) % 160
         }
-        tempx = (s.x + (160 - 4)) % 160
-        tempy = (s.y + (120 - 4)) % 120
+        tempx = (s.x + 156) % 160
+        tempy = (s.y + 116) % 120
         for (let index5 = 0; index5 < 9; index5++) {
             for (let index6 = 0; index6 < 9; index6++) {
                 if (s.allLines.getPixel(tempx, tempy) == 8 && screen().getPixel(tempx, tempy) != 2) {
@@ -173,14 +77,12 @@ namespace graphing {
                 }
                 tempy = (tempy + 1) % 120
             }
-            tempy = (s.y + (120 - 4)) % 120
+            tempy = (s.y + 116) % 120
             tempx = (tempx + 1) % 160
         }
     }
 
     function parseCommand(c: command, s: state) {
-        let x = 0
-        let y = 0
         let blank = bmp`
     1 1 1 1 1 1 1 
     1 1 1 1 1 1 1 
@@ -235,7 +137,7 @@ namespace graphing {
             1 2 2 2 
             1 1 2 2 
             1 1 1 2 
-            `, x - 3, y - 3)
+            `, s.x - 3, s.y - 3)
             }
             retainOldBits(s)
             if (s.penDown) {
