@@ -243,35 +243,35 @@ namespace graphing {
                 let index = 0
                 if (c.dist < 0) absDist = -c.dist
                 if (s.dir == 0) {
-                    while (index < absDist) {
-                        if (c.dist > 0) oldY = (oldY + 119) % 120
-                        else oldY = (oldY + 1) % 120
+                    while (index <= absDist) {
                         screen().setPixel(s.x, oldY, 8)
                         s.allLines.setPixel(s.x, oldY, 8)
+                        if (c.dist > 0) oldY = (oldY + 119) % 120
+                        else oldY = (oldY + 1) % 120
                     }
                 }
                 else if (s.dir == 1) {
-                    while (index < absDist) {
-                        if (c.dist > 0) oldX = (oldX + 1)%160
-                        else oldX = (oldX + 159)%160
+                    while (index <= absDist) {
                         screen().setPixel(oldX, s.y, 8)
                         s.allLines.setPixel(oldX, s.y, 8)
+                        if (c.dist > 0) oldX = (oldX + 1)%160
+                        else oldX = (oldX + 159)%160
                     }
                 }
                 else if (s.dir == 2) {
-                    while (index < absDist) {
-                        if (c.dist > 0) oldY = (oldY + 1) % 120
-                        else oldY = (oldY + 119) %120
+                    while (index <= absDist) {
                         screen().setPixel(s.x, oldY, 8)
                         s.allLines.setPixel(s.x, oldY, 8)
+                        if (c.dist > 0) oldY = (oldY + 1) % 120
+                        else oldY = (oldY + 119) %120
                     }
                 }
-                else {
-                    while (index < absDist) {
-                        if (c.dist > 0) oldX = (oldX + 159)%160
-                        else oldX = (oldX + 1)%160
+                else if (s.dir == 3) {
+                    while (index <= absDist) {
                         screen().setPixel(oldX, s.y, 8)
                         s.allLines.setPixel(oldX, s.y, 8)
+                        if (c.dist > 0) oldX = (oldX + 159)%160
+                        else oldX = (oldX + 1)%160
                     }
                 }
             }
@@ -316,7 +316,7 @@ namespace graphing {
             1 2 2 2 
             1 1 2 2 
             1 1 1 2 
-            `, x - 3, y - 3)
+            `, s.x - 3, s.y - 3)
             }
             if (s.penDown) {
                 screen().setPixel(s.x, s.y, 8)
