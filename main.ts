@@ -497,34 +497,32 @@ namespace graphing {
             `
 
         controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-            while (s.dir != 0) turnRight()
-            forward(2)
+            while (s.dir != 0) parseCommand(turnRight(), s)
+            parseCommand(forward(2), s)
         })
 
         controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-            while (s.dir != 3) turnRight()
-            forward(2)
+            while (s.dir != 3) parseCommand(turnRight(), s)
+            parseCommand(forward(2), s)
         })
 
         controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-            while (s.dir != 1) turnRight()
-            forward(2)
+            while (s.dir != 1) parseCommand(turnRight(), s)
+            parseCommand(forward(2), s)
         })
 
         controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-            while (s.dir != 2) turnRight
-            forward(2)
+            while (s.dir != 2) parseCommand(turnRight(), s)
+            parseCommand(forward(2), s)
         })
 
         controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-            let c: command = null
             if (s.penDown) {
-                c = { which: 3, dist: 0 }
+                parseCommand(liftPen(), s)
             }
             else {
-                c = { which: 4, dist: 0 }
+                parseCommand(dropPen(), s)
             }
-            parseCommand(c, s)
         })
 
         controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
