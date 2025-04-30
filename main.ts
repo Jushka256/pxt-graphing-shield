@@ -307,7 +307,7 @@ namespace graphing {
             1 1 1 2 1 1 1 
             `, s.x - 3, s.y)
             }
-            else {
+            else if (s.dir == 3) {
                 screen().drawBitmap(bmp`
             1 1 1 2 
             1 1 2 2 
