@@ -174,18 +174,22 @@ namespace graphing {
         let res: command = {which: 0, dist: d}
         return res
     }
+    //% block
     export function turnRight() : command {
         let res : command = {which: 1, dist: 0}
         return res
     }
+    //% block
     export function turnLeft() : command {
         let res : command = {which: 2, dist: 0}
         return res
     }
+    //% block
     export function liftPen() : command {
         let res : command = {which: 3, dist: 0}
         return res
     }
+    //% block
     export function dropPen() : command {
         let res : command = {which: 4, dist: 0}
         return res
