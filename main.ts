@@ -20,7 +20,7 @@ namespace graphing {
 
     //% block
     export function lineGraph(x_list: Array<number>, y_list: Array<number>) {
-        
+
         let normal_x_list = normaliseArray(x_list, 5, 154);
         let normal_y_list = normaliseArray(y_list, 114, 5);
         console.log(normal_x_list);
@@ -41,10 +41,19 @@ namespace graphing {
         return;
 
     }
- 
+
     type command = {
         which: number
-        dist: number}
+        dist: number
+    }
+
+    type state = {
+        x: number
+        y: number
+        dir: number //0: up, 1: right, 2: down, 3: left
+        penDown: boolean
+        allLines: Bitmap
+    }
 
     function pencilUpDirection(d: number, x: number, y: number) {
         if (d == 0) {
@@ -142,66 +151,223 @@ namespace graphing {
         }
     }
 
-    function retainOldBits(x: number, y: number, allLines: Bitmap) {
-        let tempx = (x + 155) % 160
-        let tempy = (y + 115) % 120
-        for (let index3 = 0; index3 < 11; index3++) {
-            for (let index4 = 0; index4 < 11; index4++) {
+    function retainOldBits(s: state) {
+        let tempx = (s.x + (160 - 4)) % 160
+        let tempy = (s.y + (120 - 4)) % 120
+        for (let index3 = 0; index3 < 9; index3++) {
+            for (let index4 = 0; index4 < 9; index4++) {
                 if (screen().getPixel(tempx, tempy) == 8) {
-                    allLines.setPixel(tempx, tempy, 8)
+                    s.allLines.setPixel(tempx, tempy, 8)
                 }
                 tempy = (tempy + 1) % 120
             }
-            tempy = (y + 115) % 120
+            tempy = (s.y + (120 - 4)) % 120
             tempx = (tempx + 1) % 160
         }
-        tempx = (x + 155) % 160
-        tempy = (y + 115) % 120
-        for (let index5 = 0; index5 < 11; index5++) {
-            for (let index6 = 0; index6 < 11; index6++) {
-                if (allLines.getPixel(tempx, tempy) == 8 && screen().getPixel(tempx, tempy) != 2) {
+        tempx = (s.x + (160 - 4)) % 160
+        tempy = (s.y + (120 - 4)) % 120
+        for (let index5 = 0; index5 < 9; index5++) {
+            for (let index6 = 0; index6 < 9; index6++) {
+                if (s.allLines.getPixel(tempx, tempy) == 8 && screen().getPixel(tempx, tempy) != 2) {
                     screen().setPixel(tempx, tempy, 8)
                 }
                 tempy = (tempy + 1) % 120
             }
-            tempy = (y + 115) % 120
+            tempy = (s.y + (120 - 4)) % 120
             tempx = (tempx + 1) % 160
         }
     }
 
+    function parseCommand(c: command, s: state) {
+        let x = 0
+        let y = 0
+        let blank = bmp`
+    1 1 1 1 1 1 1 
+    1 1 1 1 1 1 1 
+    1 1 1 1 1 1 1 
+    1 1 1 1 1 1 1 
+    1 1 1 1 1 1 1 
+    1 1 1 1 1 1 1 
+    1 1 1 1 1 1 1 
+            `
+        if (c.which == 0) {
+            let oldX = s.x
+            let oldY = s.y
+            screen().drawBitmap(blank, s.x-3, s.y-3)
+            retainOldBits(s)
+            if (s.dir == 0 ) {
+                s.y = (s.y + 120 - c.dist) % 120
+                screen().drawBitmap(bmp`
+            1 1 1 2 1 1 1 
+            1 1 2 2 2 1 1 
+            1 2 2 2 2 2 1 
+            2 2 2 2 2 2 2 
+            `, s.x - 3, s.y - 3)
+            }
+            else if (s.dir == 1) {
+                s.x = (s.x + c.dist) % 160
+                screen().drawBitmap(bmp`
+            2 1 1 1 
+            2 2 1 1 
+            2 2 2 1 
+            2 2 2 2 
+            2 2 2 1 
+            2 2 1 1 
+            2 1 1 1 
+            `, s.x, s.y - 3)
+            }
+            else if (s.dir == 2) {
+                s.y = (s.y + c.dist) % 120
+                screen().drawBitmap(bmp`
+            2 2 2 2 2 2 2 
+            1 2 2 2 2 2 1 
+            1 1 2 2 2 1 1 
+            1 1 1 2 1 1 1 
+            `, s.x - 3, s.y)
+            }
+            else {
+                s.x = (s.x + 160 - c.dist) % 160
+                screen().drawBitmap(bmp`
+            1 1 1 2 
+            1 1 2 2 
+            1 2 2 2 
+            2 2 2 2 
+            1 2 2 2 
+            1 1 2 2 
+            1 1 1 2 
+            `, x - 3, y - 3)
+            }
+            retainOldBits(s)
+            if (s.penDown) {
+                let absDist = c.dist
+                let index = 0
+                if (c.dist < 0) absDist = -c.dist
+                if (s.dir == 0) {
+                    while (index < absDist) {
+                        if (c.dist > 0) oldY = (oldY + 119) % 120
+                        else oldY = (oldY + 1) % 120
+                        screen().setPixel(s.x, oldY, 8)
+                        s.allLines.setPixel(s.x, oldY, 8)
+                    }
+                }
+                else if (s.dir == 1) {
+                    while (index < absDist) {
+                        if (c.dist > 0) oldX = (oldX + 1)%160
+                        else oldX = (oldX + 159)%160
+                        screen().setPixel(oldX, s.y, 8)
+                        s.allLines.setPixel(oldX, s.y, 8)
+                    }
+                }
+                else if (s.dir == 2) {
+                    while (index < absDist) {
+                        if (c.dist > 0) oldY = (oldY + 1) % 120
+                        else oldY = (oldY + 119) %120
+                        screen().setPixel(s.x, oldY, 8)
+                        s.allLines.setPixel(s.x, oldY, 8)
+                    }
+                }
+                else {
+                    while (index < absDist) {
+                        if (c.dist > 0) oldX = (oldX + 159)%160
+                        else oldX = (oldX + 1)%160
+                        screen().setPixel(oldX, s.y, 8)
+                        s.allLines.setPixel(oldX, s.y, 8)
+                    }
+                }
+            }
+        } //forward
+        else if (c.which == 1 || c.which == 2) {
+            screen().drawBitmap(blank, s.x - 3, s.y - 3)
+            if (c.which == 1) s.dir = (s.dir + 1) % 4
+            else s.dir = (s.dir + 3) % 4
+            if (s.dir == 0) {
+                screen().drawBitmap(bmp`
+            1 1 1 2 1 1 1 
+            1 1 2 2 2 1 1 
+            1 2 2 2 2 2 1 
+            2 2 2 2 2 2 2 
+            `, s.x - 3, s.y - 3)
+            }
+            else if (s.dir == 1) {
+                screen().drawBitmap(bmp`
+            2 1 1 1 
+            2 2 1 1 
+            2 2 2 1 
+            2 2 2 2 
+            2 2 2 1 
+            2 2 1 1 
+            2 1 1 1 
+            `, s.x, s.y - 3)
+            }
+            else if (s.dir == 2) {
+                screen().drawBitmap(bmp`
+            2 2 2 2 2 2 2 
+            1 2 2 2 2 2 1 
+            1 1 2 2 2 1 1 
+            1 1 1 2 1 1 1 
+            `, s.x - 3, s.y)
+            }
+            else {
+                screen().drawBitmap(bmp`
+            1 1 1 2 
+            1 1 2 2 
+            1 2 2 2 
+            2 2 2 2 
+            1 2 2 2 
+            1 1 2 2 
+            1 1 1 2 
+            `, x - 3, y - 3)
+            }
+            if (s.penDown) {
+                screen().setPixel(s.x, s.y, 8)
+            }
+            retainOldBits(s)
+        } //turnRight or turnLeft
+        else if (c.which == 3) {
+            screen().setPixel(s.x, s.y, 2)
+            s.penDown = false
+        } //liftPen
+        else if (c.which == 4) {
+            screen().setPixel(s.x, s.y, 8)
+            s.penDown = true
+        } //dropPen
+    }
+
     //% block
-    export function forward(d: number) : command {
-        let res: command = {which: 0, dist: d}
+    export function forward(d: number): command {
+        let res: command = { which: 0, dist: d }
         return res
     }
     //% block
-    export function turnRight() : command {
-        let res : command = {which: 1, dist: 0}
+    export function turnRight(): command {
+        let res: command = { which: 1, dist: 0 }
         return res
     }
     //% block
-    export function turnLeft() : command {
-        let res : command = {which: 2, dist: 0}
+    export function turnLeft(): command {
+        let res: command = { which: 2, dist: 0 }
         return res
     }
     //% block
-    export function liftPen() : command {
-        let res : command = {which: 3, dist: 0}
+    export function liftPen(): command {
+        let res: command = { which: 3, dist: 0 }
         return res
     }
     //% block
-    export function dropPen() : command {
-        let res : command = {which: 4, dist: 0}
+    export function dropPen(): command {
+        let res: command = { which: 4, dist: 0 }
         return res
     }
 
     //% block
     export function draw(arr: Array<command>) {
-        let d = 0
-        let y = 0
-        let x = 0
-        let pencilDown = true
-        let allLines = bmp`
+        let s: state = { x: 80, y: 60, dir: 0, penDown: true, allLines: null }
+        //     let d = 0
+        //     let y = 0
+        //     let x = 0
+        let index = 0
+        //     let pencilDown = true
+        s.allLines = bmp`
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -327,142 +493,43 @@ namespace graphing {
     1 1 1 2 1 1 1 
     1 1 2 2 2 1 1 
     1 2 2 2 2 2 1 
-    2 2 2 8 2 2 2 
-    1 2 2 2 2 2 1 
-    1 1 2 2 2 1 1 
-    1 1 1 2 1 1 1 
+    2 2 2 8 2 2 2  
             `
 
         controller.up.onEvent(ControllerButtonEvent.Pressed, function () {
-            if (pencilDown) {
-                pencilDownDirection(d, x, y)
-                y = (y + 118) % 120
-                screen().drawBitmap(bmp`
-            1 1 1 2 1 1 1 
-            1 1 2 2 2 1 1 
-            1 2 2 2 2 2 1 
-            2 2 2 8 2 2 2 
-            1 1 1 8 1 1 1 
-            `, x - 3, y - 3)
-                retainOldBits(x, y, allLines)
-            } else {
-                pencilUpDirection(d, x, y)
-                y = (y + 118) % 120
-                screen().drawBitmap(bmp`
-            1 1 1 2 1 1 1 
-            1 1 2 2 2 1 1 
-            1 2 2 2 2 2 1 
-            2 2 2 2 2 2 2 
-            `, x - 3, y - 3)
-                retainOldBits(x, y, allLines)
-            }
-            d = 1
+            while (s.dir != 0) turnRight()
+            forward(2)
         })
 
         controller.left.onEvent(ControllerButtonEvent.Pressed, function () {
-            if (pencilDown) {
-                pencilDownDirection(d, x, y)
-                x = (x + 158) % 160
-                screen().drawBitmap(bmp`
-            1 1 1 2 1 
-            1 1 2 2 1 
-            1 2 2 2 1 
-            2 2 2 8 8 
-            1 2 2 2 1 
-            1 1 2 2 1 
-            1 1 1 2 1 
-            `, x - 3, y - 3)
-                retainOldBits(x, y, allLines)
-            } else {
-                pencilUpDirection(d, x, y)
-                x = (x + 158) % 160
-                screen().drawBitmap(bmp`
-            1 1 1 2 
-            1 1 2 2 
-            1 2 2 2 
-            2 2 2 2 
-            1 2 2 2 
-            1 1 2 2 
-            1 1 1 2 
-            `, x - 3, y - 3)
-                retainOldBits(x, y, allLines)
-            }
-            d = 4
+            while (s.dir != 3) turnRight()
+            forward(2)
         })
 
         controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
-            if (pencilDown) {
-                pencilDownDirection(d, x, y)
-                x = (x + 2) % 160
-                screen().drawBitmap(bmp`
-            1 2 1 1 1 
-            1 2 2 1 1 
-            1 2 2 2 1 
-            8 8 2 2 2 
-            1 2 2 2 1 
-            1 2 2 1 1 
-            1 2 1 1 1 
-            `, x - 1, y - 3)
-                retainOldBits(x, y, allLines)
-            } else {
-                pencilUpDirection(d, x, y)
-                x = (x + 2) % 160
-                screen().drawBitmap(bmp`
-            2 1 1 1 
-            2 2 1 1 
-            2 2 2 1 
-            2 2 2 2 
-            2 2 2 1 
-            2 2 1 1 
-            2 1 1 1 
-            `, x, y - 3)
-                retainOldBits(x, y, allLines)
-            }
-            d = 2
+            while (s.dir != 1) turnRight()
+            forward(2)
         })
 
         controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
-            if (pencilDown) {
-                pencilDownDirection(d, x, y)
-                y = (y + 2) % 120
-                screen().drawBitmap(bmp`
-            1 1 1 8 1 1 1 
-            2 2 2 8 2 2 2 
-            1 2 2 2 2 2 1 
-            1 1 2 2 2 1 1 
-            1 1 1 2 1 1 1 
-            `, x - 3, y - 1)
-                retainOldBits(x, y, allLines)
-            } else {
-                pencilUpDirection(d, x, y)
-                y = (y + 2) % 120
-                screen().drawBitmap(bmp`
-            2 2 2 2 2 2 2 
-            1 2 2 2 2 2 1 
-            1 1 2 2 2 1 1 
-            1 1 1 2 1 1 1 
-            `, x - 3, y)
-                retainOldBits(x, y, allLines)
-            }
-            d = 3
+            while (s.dir != 2) turnRight
+            forward(2)
         })
 
         controller.A.onEvent(ControllerButtonEvent.Pressed, function () {
-            pencilDown = !(pencilDown)
-            if (!(pencilDown)) {
-                screen().drawBitmap(bmp`
-            2 
-            `, x, y)
-            } else {
-                screen().drawBitmap(bmp`
-            8 
-            `, x, y)
+            let c: command = null
+            if (s.penDown) {
+                c = { which: 3, dist: 0 }
             }
+            else {
+                c = { which: 4, dist: 0 }
+            }
+            parseCommand(c, s)
         })
 
         controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
-            pencilDown = true
-            allLines = bmp`
+            s.penDown = true
+            s.allLines = bmp`
         1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
         1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
         1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -584,17 +651,20 @@ namespace graphing {
         1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
         1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
                 `
-            x = 80
-            y = 60
-            d = 0
+            s.x = 80
+            s.y = 60
+            s.dir = 0
             screen().fill(1)
-            screen().drawBitmap(shape, x - 3, y - 3)
+            screen().drawBitmap(shape, s.x - 3, s.y - 3)
         })
 
-        x = 80
-        y = 60
         screen().fill(1)
-        screen().drawBitmap(shape, x - 3, y - 3)
+        screen().drawBitmap(shape, s.x - 3, s.y - 3)
+
+        while (index < arr.length) {
+            parseCommand(arr[index], s)
+            index++
+        }
 
     }
 
