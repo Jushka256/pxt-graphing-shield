@@ -1,4 +1,4 @@
- namespace graphing {
+namespace graphing {
 
 
     // note that Caml casing yields lower case
@@ -42,6 +42,10 @@
 
     }
  
+    type command = {
+        which: number
+        dist: number}
+
     function pencilUpDirection(d: number, x: number, y: number) {
         if (d == 0) {
             screen().drawBitmap(bmp`
@@ -141,8 +145,8 @@
     function retainOldBits(x: number, y: number, allLines: Bitmap) {
         let tempx = (x + 155) % 160
         let tempy = (y + 115) % 120
-        for (let index = 0; index < 11; index++) {
-            for (let index = 0; index < 11; index++) {
+        for (let index3 = 0; index3 < 11; index3++) {
+            for (let index4 = 0; index4 < 11; index4++) {
                 if (screen().getPixel(tempx, tempy) == 8) {
                     allLines.setPixel(tempx, tempy, 8)
                 }
@@ -153,8 +157,8 @@
         }
         tempx = (x + 155) % 160
         tempy = (y + 115) % 120
-        for (let index = 0; index < 11; index++) {
-            for (let index = 0; index < 11; index++) {
+        for (let index5 = 0; index5 < 11; index5++) {
+            for (let index6 = 0; index6 < 11; index6++) {
                 if (allLines.getPixel(tempx, tempy) == 8 && screen().getPixel(tempx, tempy) != 2) {
                     screen().setPixel(tempx, tempy, 8)
                 }
@@ -166,7 +170,29 @@
     }
 
     //% block
-    export function freeDraw() {
+    export function forward(d: number) : command {
+        let res: command = {which: 0, dist: d}
+        return res
+    }
+    export function turnRight() : command {
+        let res : command = {which: 1, dist: 0}
+        return res
+    }
+    export function turnLeft() : command {
+        let res : command = {which: 2, dist: 0}
+        return res
+    }
+    export function liftPen() : command {
+        let res : command = {which: 3, dist: 0}
+        return res
+    }
+    export function dropPen() : command {
+        let res : command = {which: 4, dist: 0}
+        return res
+    }
+
+    //% block
+    export function draw(arr: Array<command>) {
         let d = 0
         let y = 0
         let x = 0
