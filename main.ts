@@ -577,7 +577,6 @@ namespace graphing {
     let xAxis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     let yAxis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     loops.everyInterval(500, function () {
-        let xCol = 0
         for (let i = 0; i < 24; i += 1) {
             xAxis[i] = xAxis[i + 1]
             yAxis[i] = yAxis[i + 1]
