@@ -159,6 +159,7 @@ namespace graphing {
                         s.allLines.setPixel(oldX, s.y, 8)
                         if (c.dist > 0) oldX = (oldX + 1)%160
                         else oldX = (oldX + 159)%160
+                        index += 1
                     }
                 }
                 else if (s.dir == 2) {
@@ -167,6 +168,7 @@ namespace graphing {
                         s.allLines.setPixel(s.x, oldY, 8)
                         if (c.dist > 0) oldY = (oldY + 1) % 120
                         else oldY = (oldY + 119) %120
+                        index += 1
                     }
                 }
                 else if (s.dir == 3) {
@@ -175,6 +177,7 @@ namespace graphing {
                         s.allLines.setPixel(oldX, s.y, 8)
                         if (c.dist > 0) oldX = (oldX + 159)%160
                         else oldX = (oldX + 1)%160
+                        index += 1
                     }
                 }
             }
