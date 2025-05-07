@@ -145,11 +145,12 @@ namespace graphing {
                 let index = 0
                 if (c.dist < 0) absDist = -c.dist
                 if (s.dir == 0) {
-                    while (index <= c.dist/*absDist*/) {
+                    while (index <= absDist) {
                         screen().setPixel(s.x, oldY, 8)
                         s.allLines.setPixel(s.x, oldY, 8)
-                        /*if (c.dist > 0)*/ oldY = (oldY + 119) % 120
-                        //else oldY = (oldY + 1) % 120
+                        if (c.dist > 0) oldY = (oldY + 119) % 120
+                        else oldY = (oldY + 1) % 120
+                        index += 1
                     }
                 }
                 else if (s.dir == 1) {
