@@ -5,7 +5,8 @@
         "core": "*",
         "radio": "*",
         "microphone": "*",
-        "display-shield": "github:microbit-apps/display-shield#v1.0.5"
+        "display-shield": "github:microbit-apps/display-shield#v1.0.5",
+        "datalogger": "*"
     },
     "files": [
         "main.blocks",

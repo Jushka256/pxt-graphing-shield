@@ -142,42 +142,42 @@ namespace graphing {
             retainOldBits(s)
             if (s.penDown) {
                 let absDist = c.dist
-                let index = 0
+                let index7 = 0
                 if (c.dist < 0) absDist = -c.dist
                 if (s.dir == 0) {
-                    while (index <= absDist) {
+                    while (index7 <= absDist) {
                         screen().setPixel(s.x, oldY, 8)
                         s.allLines.setPixel(s.x, oldY, 8)
                         if (c.dist > 0) oldY = (oldY + 119) % 120
                         else oldY = (oldY + 1) % 120
-                        index += 1
+                        index7 += 1
                     }
                 }
                 else if (s.dir == 1) {
-                    while (index <= absDist) {
+                    while (index7 <= absDist) {
                         screen().setPixel(oldX, s.y, 8)
                         s.allLines.setPixel(oldX, s.y, 8)
                         if (c.dist > 0) oldX = (oldX + 1)%160
                         else oldX = (oldX + 159)%160
-                        index += 1
+                        index7 += 1
                     }
                 }
                 else if (s.dir == 2) {
-                    while (index <= absDist) {
+                    while (index7 <= absDist) {
                         screen().setPixel(s.x, oldY, 8)
                         s.allLines.setPixel(s.x, oldY, 8)
                         if (c.dist > 0) oldY = (oldY + 1) % 120
                         else oldY = (oldY + 119) %120
-                        index += 1
+                        index7 += 1
                     }
                 }
                 else if (s.dir == 3) {
-                    while (index <= absDist) {
+                    while (index7 <= absDist) {
                         screen().setPixel(oldX, s.y, 8)
                         s.allLines.setPixel(oldX, s.y, 8)
                         if (c.dist > 0) oldX = (oldX + 159)%160
                         else oldX = (oldX + 1)%160
-                        index += 1
+                        index7 += 1
                     }
                 }
             }
@@ -246,23 +246,23 @@ namespace graphing {
     }
     //% block
     export function turnRight(): command {
-        let res: command = { which: 1, dist: 0 }
-        return res
+        let res2: command = { which: 1, dist: 0 }
+        return res2
     }
     //% block
     export function turnLeft(): command {
-        let res: command = { which: 2, dist: 0 }
-        return res
+        let res3: command = { which: 2, dist: 0 }
+        return res3
     }
     //% block
     export function liftPen(): command {
-        let res: command = { which: 3, dist: 0 }
-        return res
+        let res4: command = { which: 3, dist: 0 }
+        return res4
     }
     //% block
     export function dropPen(): command {
-        let res: command = { which: 4, dist: 0 }
-        return res
+        let res5: command = { which: 4, dist: 0 }
+        return res5
     }
 
     //% block
@@ -271,7 +271,7 @@ namespace graphing {
         //     let d = 0
         //     let y = 0
         //     let x = 0
-        let index = 0
+        let index8 = 0
         //     let pencilDown = true
         s.allLines = bmp`
     1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111
@@ -565,11 +565,59 @@ namespace graphing {
         screen().fill(1)
         screen().drawBitmap(shape, s.x - 3, s.y - 3)
 
-        while (index < arr.length) {
-            parseCommand(arr[index], s)
-            index++
+        while (index8 < arr.length) {
+            parseCommand(arr[index8], s)
+            index8++
         }
 
+    }
+
+    //% block
+    export function liveGraph(xCol: number, yCol: number) {
+    let xAxis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    let yAxis = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    loops.everyInterval(500, function () {
+        let xCol = 0
+        for (let i = 0; i < 24; i += 1) {
+            xAxis[i] = xAxis[i + 1]
+            yAxis[i] = yAxis[i + 1]
+        }
+        if (xCol == 0) {
+            xAxis[24] = input.runningTime()
+        } else if (xCol == 1) {
+            xAxis[24] = input.acceleration(Dimension.X)
+        } else if (xCol == 2) {
+            xAxis[24] = input.acceleration(Dimension.Y)
+        } else if (xCol == 3) {
+            xAxis[24] = input.acceleration(Dimension.Z)
+        } else if (xCol == 4) {
+            xAxis[24] = input.lightLevel()
+        } else if (xCol == 5) {
+            xAxis[24] = input.compassHeading()
+        } else if (xCol == 6) {
+            xAxis[24] = input.temperature()
+        } else if (xCol == 7) {
+            xAxis[24] = input.soundLevel()
+        }
+        if (yCol == 0) {
+            yAxis[24] = input.runningTime()
+        } else if (yCol == 1) {
+            yAxis[24] = input.acceleration(Dimension.X)
+        } else if (yCol == 2) {
+            yAxis[24] = input.acceleration(Dimension.Y)
+        } else if (yCol == 3) {
+            yAxis[24] = input.acceleration(Dimension.Z)
+        } else if (yCol == 4) {
+            yAxis[24] = input.lightLevel()
+        } else if (yCol == 5) {
+            yAxis[24] = input.compassHeading()
+        } else if (yCol == 6) {
+            yAxis[24] = input.temperature()
+        } else if (yCol == 7) {
+            yAxis[24] = input.soundLevel()
+        }
+        lineGraph(xAxis, yAxis)
+    })
     }
 
 }
